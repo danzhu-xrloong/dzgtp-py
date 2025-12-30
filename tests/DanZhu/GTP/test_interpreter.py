@@ -9,41 +9,56 @@ def interpreter():
 def test_import_interpreter():
     from DanZhu.GTP import interpreter
 
-def test_interpret_empty_respose__with_id(interpreter: ModuleType):
-    response = interpreter.interpretSuccess(response = "", id = 2397)
-    assert response == "=2397"
+@pytest.mark.parametrize(
+    argnames='id, response, expected',
+    argvalues=[
+        (2397, "test-response", "=2397 test-response"),
+        (None, "test-response", "= test-response"),
+        (2397, "", "=2397"),
+        (None, "", "="),
+        ]
+)
+def test_interpretSuccess(
+    interpreter: ModuleType,
+    id: int | None,
+    response: str,
+    expected: str
+    ):
+    response = interpreter.interpretSuccess(response = response, id = id)
+    assert response == expected
 
-def test_interpret_empty_respose__without_id(interpreter: ModuleType):
-    response = interpreter.interpretSuccess(response = "")
-    assert response == "="
-
-def test_interpret_response__with_id(interpreter: ModuleType):
-    response = interpreter.interpretSuccess(response = "test-response", id = 2397)
-    assert response == "=2397 test-response"
-
-def test_interpret_response__without_id(interpreter: ModuleType):
-    response = interpreter.interpretSuccess(response = "test-response")
-    assert response == "= test-response"
-
-def test_interpret_failure__with_id(interpreter: ModuleType):
-    response = interpreter.interpretFailure(error = "test-error", id = 2397)
-    assert response == "?2397 test-error"
-
-def test_interpret_failure__without_id(interpreter: ModuleType):
-    response = interpreter.interpretFailure(error = "test-error")
-    assert response == "? test-error"
+@pytest.mark.parametrize(
+    argnames='id, error, expected',
+    argvalues=[
+        (2397, "test-error", "?2397 test-error"),
+        (None, "test-error", "? test-error"),
+        ]
+)
+def test_interpretFailure(
+    interpreter: ModuleType,
+    id: int | None,
+    error: str,
+    expected: str
+    ):
+    response = interpreter.interpretFailure(error = error, id = id)
+    assert response == expected
 
 def test_interpret_panic(interpreter: ModuleType):
     response = interpreter.interpretPanic()
     assert response == "! panic"
 
-def test_interpret_response(interpreter: ModuleType):
-    strResponse = interpreter.interpretResponse("=1234 test-response")
-    assert strResponse == "=1234 test-response\n\n"
-
-    strError = interpreter.interpretResponse("?1234 test-error")
-    assert strError == "?1234 test-error\n\n"
-
-    strPanic = interpreter.interpretResponse("! panic")
-    assert strPanic == "! panic\n\n"
-
+@pytest.mark.parametrize(
+    argnames='message, expected',
+    argvalues=[
+        ("=1234 test-response", "=1234 test-response\n\n"),
+        ("?1234 test-error", "?1234 test-error\n\n"),
+        ("! panic", "! panic\n\n"),
+        ]
+)
+def test_interpret_response(
+    interpreter: ModuleType,
+    message: str,
+    expected: str
+    ):
+    response = interpreter.interpretResponse(message)
+    assert response == expected
