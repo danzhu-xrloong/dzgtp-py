@@ -1,7 +1,7 @@
 [project]
 name = "dzgtp-py"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Python implementation of the GTP (Go Text Protocol) engine"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
