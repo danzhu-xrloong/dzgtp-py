@@ -17,7 +17,15 @@ def engineHandler():
     streamEngineToOutsideReceiver = open(pipeEngineToOutside[0], "r")
     streamEngineToOutsideSender = open(pipeEngineToOutside[1], "w")
 
-    e = engine.GtpEngine(streamIn = streamOutsideToEngineReceiver, streamOut = streamEngineToOutsideSender)
+    config = engine.GtpEngine.Config(
+        name = "DanZhu-GTP Tests",
+        version = "2.1.3"
+    )
+    e = engine.GtpEngine(
+        config = config,
+        streamIn = streamOutsideToEngineReceiver,
+        streamOut = streamEngineToOutsideSender
+        )
     yield (e, streamOutsideToEngineSender, streamEngineToOutsideReceiver)
 
     streamOutsideToEngineReceiver.close()
@@ -70,6 +78,8 @@ def test_interpretSuccess(
     argnames='command, expected, expectedDone',
     argvalues=[
         ("2397 protocol_version", "=2397 2", None),
+        ("2397 name", "=2397 DanZhu-GTP Tests", None),
+        ("2397 version", "=2397 2.1.3", None),
         ("2397 quit", "=2397", True),
         ("2397 test-command", "?2397 unknown command", None),
         ]

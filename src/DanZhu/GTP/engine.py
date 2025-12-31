@@ -1,6 +1,7 @@
 from . import interpreter
 from contextlib import redirect_stdout
 from contextlib import contextmanager
+from dataclasses import dataclass
 
 @contextmanager
 def redirect_stdin(new_stdin):
@@ -16,7 +17,17 @@ def redirect_stdin(new_stdin):
 class GtpEngine:
     PROTOCOL_VERSION = 2
 
-    def __init__(self, streamIn, streamOut):
+    @dataclass(frozen=True)
+    class Config:
+        name: str
+        version: str
+
+    def __init__(self,
+                 config: Config,
+                 streamIn,
+                 streamOut
+                 ):
+        self.config = config
         self.streamIn = streamIn
         self.streamOut = streamOut
 
@@ -75,6 +86,10 @@ class GtpEngine:
             return True
         if command == "protocol_version":
             self.outputSuccess("{}".format(GtpEngine.PROTOCOL_VERSION), id)
+        if command == "name":
+            self.outputSuccess("{}".format(self.config.name), id)
+        if command == "version":
+            self.outputSuccess("{}".format(self.config.version), id)
         else:
             self.outputFailure("unknown command", id)
 
