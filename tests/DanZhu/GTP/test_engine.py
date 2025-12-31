@@ -65,3 +65,24 @@ def test_interpretSuccess(
     line = streamEngineToOutsideReceiver.readline()
     assert line.strip() == expected
 
+
+@pytest.mark.parametrize(
+    argnames='command, expected, expectedDone',
+    argvalues=[
+        ("2397 protocol_version", "=2397 2", None),
+        ("2397 quit", "=2397", True),
+        ("2397 test-command", "?2397 unknown command", None),
+        ]
+)
+def test_interpretCommand(
+        engineHandler: EngineHandler,
+        command: str,
+        expected: str,
+        expectedDone: bool
+    ):
+    engine, _, streamEngineToOutsideReceiver = engineHandler
+
+    done = engine.interpretCommand(command)
+    line = streamEngineToOutsideReceiver.readline()
+    assert done == expectedDone
+    assert line.strip() == expected
