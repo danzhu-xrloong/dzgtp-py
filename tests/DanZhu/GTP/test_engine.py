@@ -96,3 +96,28 @@ def test_interpretCommand(
     line = streamEngineToOutsideReceiver.readline()
     assert done == expectedDone
     assert line.strip() == expected
+
+def test_list_commands(engineHandler: EngineHandler):
+    engine, _, streamEngineToOutsideReceiver = engineHandler
+    expected = "= " + "\n".join((
+        "list_commands",
+        "name",
+        "protocol_version",
+        "quit",
+        "version",
+    )) + "\n\n"
+    expectedDone = None
+
+    done = engine.interpretCommand("list_commands")
+    engine.interpretCommand("quit")
+    assert done == expectedDone
+
+    output = ""
+    while True:
+        chunk = streamEngineToOutsideReceiver.readline()
+        output += chunk
+        if output.endswith("\n\n"):
+            break
+
+    assert output == expected
+

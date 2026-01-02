@@ -113,3 +113,8 @@ class GtpEngine:
         def _version(id, *args):
             self.outputSuccess(f"{self.config.version}", id)
 
+        @self.register_command("list_commands")
+        def _list_commands(id, *args) -> str:
+            commands = '\n'.join(sorted(self._command_registry.keys()))
+            self.outputSuccess(f"{commands}", id)
+
