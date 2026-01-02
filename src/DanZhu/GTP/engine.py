@@ -79,17 +79,18 @@ class GtpEngine:
             command = parts[0]
             args = parts[1:]
 
-        if command == "quit":
-            self.outputSuccess("", id)
-            self.streamIn.close()
-            self.streamOut.close()
-            return True
-        elif command == "protocol_version":
-            self.outputSuccess("{}".format(GtpEngine.PROTOCOL_VERSION), id)
-        elif command == "name":
-            self.outputSuccess("{}".format(self.config.name), id)
-        elif command == "version":
-            self.outputSuccess("{}".format(self.config.version), id)
-        else:
-            self.outputFailure("unknown command", id)
+        match command:
+            case "quit":
+                self.outputSuccess("", id)
+                self.streamIn.close()
+                self.streamOut.close()
+                return True
+            case "protocol_version":
+                self.outputSuccess("{}".format(GtpEngine.PROTOCOL_VERSION), id)
+            case "name":
+                self.outputSuccess("{}".format(self.config.name), id)
+            case "version":
+                self.outputSuccess("{}".format(self.config.version), id)
+            case _:
+                self.outputFailure("unknown command", id)
 
