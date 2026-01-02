@@ -30,6 +30,14 @@ class GtpEngine:
         self.config = config
         self.streamIn = streamIn
         self.streamOut = streamOut
+        self._command_registry = {}
+        self._register_builtin_commands()
+
+    def register_command(self, name):
+        def decorator(func):
+            self._command_registry[name] = func
+            return func
+        return decorator
 
     def input(self) -> str:
         line = self.streamIn.readline()
@@ -79,18 +87,29 @@ class GtpEngine:
             command = parts[0]
             args = parts[1:]
 
-        match command:
-            case "quit":
-                self.outputSuccess("", id)
-                self.streamIn.close()
-                self.streamOut.close()
-                return True
-            case "protocol_version":
-                self.outputSuccess("{}".format(GtpEngine.PROTOCOL_VERSION), id)
-            case "name":
-                self.outputSuccess("{}".format(self.config.name), id)
-            case "version":
-                self.outputSuccess("{}".format(self.config.version), id)
-            case _:
-                self.outputFailure("unknown command", id)
+        handler = self._command_registry.get(command)
+        if handler:
+            return handler(id, *args)
+        else:
+            self.outputFailure("unknown command", id)
+
+    def _register_builtin_commands(self):
+        @self.register_command("quit")
+        def _quit(id, *args):
+            self.outputSuccess("", id)
+            self.streamIn.close()
+            self.streamOut.close()
+            return True
+
+        @self.register_command("protocol_version")
+        def _protocol_version(id, *args):
+            self.outputSuccess(f"{GtpEngine.PROTOCOL_VERSION}", id)
+
+        @self.register_command("name")
+        def _name(id, *args):
+            self.outputSuccess(f"{self.config.name}", id)
+
+        @self.register_command("version")
+        def _version(id, *args):
+            self.outputSuccess(f"{self.config.version}", id)
 
