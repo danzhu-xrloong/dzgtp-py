@@ -84,11 +84,11 @@ class GtpEngine:
             self.streamIn.close()
             self.streamOut.close()
             return True
-        if command == "protocol_version":
+        elif command == "protocol_version":
             self.outputSuccess("{}".format(GtpEngine.PROTOCOL_VERSION), id)
-        if command == "name":
+        elif command == "name":
             self.outputSuccess("{}".format(self.config.name), id)
-        if command == "version":
+        elif command == "version":
             self.outputSuccess("{}".format(self.config.version), id)
         else:
             self.outputFailure("unknown command", id)
